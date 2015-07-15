@@ -14,6 +14,7 @@ reated by https://www.gitignore.io
 # Generated files
 bin/
 gen/
+*~
 
 # Gradle files
 .gradle/
