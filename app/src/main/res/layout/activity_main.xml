@@ -16,9 +16,11 @@
                 android:textStyle="bold" android:textSize="30dp"/>
 
         <LinearLayout
+                android:id="@+id/viewAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:paddingBottom="30dp"
                 android:layout_gravity="center_horizontal">
 
             <EditText
@@ -34,6 +36,36 @@
                     android:text="Connect"/>
 
         </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/viewInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="30dp"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+            <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/txtInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    />
+
+        </LinearLayout>
+
+
+        <TextView
+                android:id="@+id/txtMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="18dp"/>
 
     </LinearLayout>
 
