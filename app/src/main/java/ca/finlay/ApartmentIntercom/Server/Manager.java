@@ -15,6 +15,14 @@ public class Manager {
     }
 
     public static void CheckNumber(RequestListener caller, String baseURL, String phoneNumber) {
-        new PostTask(caller).execute(baseURL + "/mobile/checknumber","number="+phoneNumber);
+        new PostTask(caller).execute(baseURL + "/mobile/check_number","number="+phoneNumber);
+    }
+
+    public static void AddNumber(RequestListener caller, String baseURL, String phoneNumber) {
+        new PostTask(caller).execute(baseURL + "/mobile/add_number","number="+phoneNumber);
+    }
+
+    public static void RemoveNumber(RequestListener caller, String baseURL, String phoneNumber) {
+        new PostTask(caller).execute(baseURL + "/mobile/remove_number","number="+phoneNumber);
     }
 }

@@ -37,6 +37,27 @@
 
         </LinearLayout>
 
+        <LinearLayout
+                android:id="@+id/viewComplete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your number is set on the server"/>
+
+            <Button
+                    android:id="@+id/btnRemove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remove number"/>
+
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
