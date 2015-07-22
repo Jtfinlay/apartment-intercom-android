@@ -1,5 +1,9 @@
 package ca.finlay.ApartmentIntercom.Server;
 
+import android.util.Log;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by James on 2015-07-15.
  */
@@ -14,9 +18,9 @@ public class Manager {
         new GetTask(caller).execute(Manager.HELLO, baseURL + "/mobile/hello");
     }
 
-    public static void CheckNumber(RequestListener caller, String baseURL, String phoneNumber) {
+    public static void CheckNumber(RequestListener caller, String baseURL, String phoneNumber) throws JSONException {
         new PostTask(caller).execute(Manager.CHECKNUMBER,
                 baseURL + "/mobile/checknumber",
-                "{'number':'"+phoneNumber+"'}");
+                "number="+phoneNumber);
     }
 }
