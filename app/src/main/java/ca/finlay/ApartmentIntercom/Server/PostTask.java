@@ -1,8 +1,6 @@
 package ca.finlay.ApartmentIntercom.Server;
 
 import android.os.AsyncTask;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -18,7 +16,6 @@ public class PostTask extends AsyncTask<String, Void, String> {
 
     private RequestListener _parent;
     private Exception exception;
-    private String _id;
 
     public PostTask(RequestListener parent) { _parent = parent; }
 
@@ -26,9 +23,8 @@ public class PostTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         try
         {
-            _id = params[0];
-            String url = params[1];
-            String data = params[2];
+            String url = params[0];
+            String data = params[1];
 
             StringBuffer response = new StringBuffer();
             URL obj = new URL(url);
@@ -65,13 +61,13 @@ public class PostTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    protected void onPostExecute(String string) {
+    protected void onPostExecute(String result) {
         if (exception != null)
         {
             _parent.onRequestError(exception);
         } else
         {
-            _parent.onRequestComplete(_id, string);
+            _parent.onRequestComplete(result);
         }
     }
 }

@@ -1,5 +1,6 @@
 package ca.finlay.ApartmentIntercom;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -23,8 +24,15 @@ public class MainActivity extends ActionBarActivity implements RequestListener {
     private String _srvAddress;
     private Button _btnConnect;
     private EditText _txtAddress;
-    private TextView _txtMessage, _txtInfo;
-    private View _vAddress, _vInfo;
+    private View _vInit;
+    private ProgressDialog _progress;
+
+
+    private STATE _state = STATE.INIT;
+    private enum STATE {
+      INIT, CONNECT, VALIDATE_NUMBER, ADD_NUMBER, REMOVE_NUMBER;
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,77 +42,98 @@ public class MainActivity extends ActionBarActivity implements RequestListener {
         // TODO::JF If server known, check whether phone is connected
 
         // Layout items
-        _btnConnect = (Button) findViewById(R.id.btnAddress);
+        _btnConnect = (Button) findViewById(R.id.btnConnect);
         _txtAddress = (EditText) findViewById(R.id.txtAddress);
-        _txtMessage = (TextView) findViewById(R.id.txtMessage);
-        _txtInfo = (TextView) findViewById(R.id.txtInfo);
-        _vAddress = (View) findViewById(R.id.viewAddress);
-        _vInfo = (View) findViewById(R.id.viewInfo);
+        _vInit = findViewById(R.id.viewInit);
+        _progress = new ProgressDialog(this);
 
-        _btnConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                _srvAddress = _txtAddress.getText().toString();
-                _srvAddress = "http://mind-craft.cloudapp.net";
-                _vAddress.setVisibility(View.GONE);
-                _vInfo.setVisibility(View.VISIBLE);
+        _progress.setCanceledOnTouchOutside(false);
 
-                _txtInfo.setText("Connecting...");
-                Manager.GetHello(MainActivity.this, _srvAddress);
-
-                // TODO::JF Check whether number is in system
-                // TODO::JF If number is not in system, ask user if they want to add it.
-
-            }
-        });
+        performStateLogic();
     }
 
-    private void onHelloComplete(boolean hasSetup)
+    private void performStateLogic()
     {
-        if (!hasSetup) {
-            _vInfo.setVisibility(View.GONE);
-            _vAddress.setVisibility(View.VISIBLE);
-            _txtMessage.setText("No admin set. Please access web portal.");
-            return;
-        }
-        _txtInfo.setText("Admin set up...");
+        switch (_state)
+        {
+            case INIT:
+                _progress.cancel();
+                _vInit.setVisibility(View.VISIBLE);
+                _btnConnect.setOnClickListener(new ConnectButtonListener());
+                break;
 
+            case CONNECT:
+                _progress.setTitle("Connecting...");
+                _progress.show();
+                Manager.GetHello(MainActivity.this, _srvAddress);
+                break;
+
+            case VALIDATE_NUMBER:
+                _progress.setTitle("Validating...");
+                TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+                Manager.CheckNumber(MainActivity.this, _srvAddress, tMgr.getLine1Number());
+                break;
+
+            case ADD_NUMBER:
+            case REMOVE_NUMBER:
+                break;
+        }
     }
 
     @Override
-    public void onRequestComplete(String ID, String result) {
+    public void onRequestComplete(String result) {
         try {
-        if (ID.equals(Manager.HELLO)) {
-
-            JSONObject obj = null;
-                obj = new JSONObject(result);
-
-            onHelloComplete(obj.getBoolean("setup"));
-
-             TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-            Log.v(TAG, "Number is " + tMgr.getLine1Number());
-             Manager.CheckNumber(MainActivity.this, _srvAddress, tMgr.getLine1Number());
-
-        } else if (ID.equals(Manager.CHECKNUMBER)) {
 
             JSONObject obj = new JSONObject(result);
-            boolean exists = obj.getBoolean("exists");
+            switch (_state) {
 
-            if (exists) {
-                Toast.makeText(this, "Already in system!", Toast.LENGTH_SHORT).show();
-                return;
+                case CONNECT:
+                    boolean setup = obj.getBoolean("setup");
+
+                    if (setup) {
+                        _state = STATE.VALIDATE_NUMBER;
+                    } else {
+                        _state = STATE.INIT;
+                        Toast.makeText(this, "No admin set. Please access web portal.", Toast.LENGTH_SHORT).show();
+                    }
+                    performStateLogic();
+                    break;
+
+                case VALIDATE_NUMBER:
+                    boolean exists = obj.getBoolean("exists");
+
+                    if (exists) {
+                        Toast.makeText(this, "Already in system.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    break;
             }
-
-            _txtInfo.setText(result);
-        }
         } catch (JSONException e) {
             e.printStackTrace();
+            Toast.makeText(this, "JSON Exception. Inform developer", Toast.LENGTH_SHORT).show();
+
+            _state = STATE.INIT;
+            performStateLogic();
         }
     }
 
     @Override
     public void onRequestError(Exception e) {
-        Toast.makeText(this, "Error sending request", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Request Exception. Inform developer", Toast.LENGTH_SHORT).show();
         e.printStackTrace();
+
+        _state = STATE.INIT;
+        performStateLogic();
+    }
+
+    private class ConnectButtonListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+//            _srvAddress = _txtAddress.getText().toString();
+            _srvAddress = "http://mind-craft.cloudapp.net";
+            _state = STATE.CONNECT;
+            performStateLogic();
+        }
     }
 }

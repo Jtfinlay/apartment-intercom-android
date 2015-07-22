@@ -1,9 +1,5 @@
 package ca.finlay.ApartmentIntercom.Server;
 
-import android.util.Log;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Created by James on 2015-07-15.
  */
@@ -15,12 +11,10 @@ public class Manager {
     public static final String CHECKNUMBER = "1";
 
     public static void GetHello(RequestListener caller, String baseURL) {
-        new GetTask(caller).execute(Manager.HELLO, baseURL + "/mobile/hello");
+        new GetTask(caller).execute(baseURL + "/mobile/hello");
     }
 
-    public static void CheckNumber(RequestListener caller, String baseURL, String phoneNumber) throws JSONException {
-        new PostTask(caller).execute(Manager.CHECKNUMBER,
-                baseURL + "/mobile/checknumber",
-                "number="+phoneNumber);
+    public static void CheckNumber(RequestListener caller, String baseURL, String phoneNumber) {
+        new PostTask(caller).execute(baseURL + "/mobile/checknumber","number="+phoneNumber);
     }
 }

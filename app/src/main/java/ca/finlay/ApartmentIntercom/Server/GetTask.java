@@ -21,8 +21,6 @@ public class GetTask extends AsyncTask<String, Void, String> {
 
     private RequestListener _parent;
     private Exception exception;
-    private String _id;
-
 
     public GetTask(RequestListener parent)
     {
@@ -34,8 +32,7 @@ public class GetTask extends AsyncTask<String, Void, String> {
     {
         try
         {
-            _id = urls[0];
-            String url = urls[1];
+            String url = urls[0];
 
             StringBuffer response = new StringBuffer();
             URL obj = new URL(url);
@@ -43,8 +40,6 @@ public class GetTask extends AsyncTask<String, Void, String> {
 
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", USER_AGENT);
-
-            int responseCode = con.getResponseCode();
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
@@ -68,7 +63,7 @@ public class GetTask extends AsyncTask<String, Void, String> {
             _parent.onRequestError(exception);
         } else
         {
-            _parent.onRequestComplete(_id, string);
+            _parent.onRequestComplete(string);
         }
     }
 
